@@ -4,7 +4,7 @@ import { ModeToggle } from "./ModeToggle";
 
 function Navbar() {
   return (
-    <div className="flex items-center justify-between border-b p-3">
+    <div className="flex px-14 items-center justify-between border-b p-3">
       <Link href="/">
         <h1 className="font-bold text-xl hover:text-gray-300 transition-all duration-200">
           Type<span>Wizard</span>
