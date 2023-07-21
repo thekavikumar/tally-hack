@@ -1,5 +1,5 @@
 import { RotateCwIcon } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const paragraphs = [
   "The quick brown fox jumps over the lazy dog. She sells seashells by the seashore.",
@@ -35,10 +35,14 @@ const TypingPractice = () => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-7 p-4">
-      <div className="border border-gray-400 p-4 mb-4 text-lg">
+    <div className="flex flex-col items-center gap-7 ">
+      <div className="p-4 mb-4 text-lg">
         {" "}
         {/* Increase font size for the paragraphs */}
+        <div className="flex mb-4 items-center gap-5">
+          <h1>60/wpm</h1>
+          <h1>90%</h1>
+        </div>
         {currentParagraph.split(". ").map((sentence, index) => (
           <p key={index} className="font-medium text-3xl">
             {sentence.split("").map((letter, letterIndex) => (
@@ -64,7 +68,7 @@ const TypingPractice = () => {
           type="text"
           value={typedText}
           onChange={handleInputChange}
-          className="border-b-2 font-medium border-blue-600 focus:outline-none focus:border-blue-800 mt-2"
+          className=" border bg-foreground/5 rounded-md w-full text-green-400 border-gray-400 focus:border-green-400 p-3 font-medium focus:ring-2 focus:ring-green-400 focus:outline-none mt-5"
           autoFocus
         />
       </div>
@@ -73,6 +77,7 @@ const TypingPractice = () => {
         className="flex items-center gap-1 bg-transparent text-foreground/20 hover:text-foreground transition-all duration-150"
       >
         <RotateCwIcon size={16} />
+        Restart
       </button>
     </div>
   );
