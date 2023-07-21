@@ -1,6 +1,7 @@
 import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef } from "react";
 import Time from "../components/Timer";
+import { DialogDemo } from "./Dialog";
 
 function WPM(value: string, sentence: string) {
   const words = sentence.split(" ");
@@ -35,8 +36,7 @@ const TypingPractice = () => {
     generateRandomParagraph()
   );
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
-  const [words, setwords] = useState<number>(0);
-  const [currentWord, setCurrentWord] = useState<String>("");
+  const [gameOver, setGameOver] = useState<boolean>(true); // [TODO
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
   const [startCounting, setStartCounting] = useState<boolean>(false);
@@ -118,6 +118,7 @@ const TypingPractice = () => {
         <RotateCwIcon size={16} />
         Restart
       </button>
+      {gameOver && <DialogDemo />}
     </div>
   );
 };
