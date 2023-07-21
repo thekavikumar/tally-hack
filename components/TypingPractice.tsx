@@ -1,30 +1,27 @@
-import { RotateCwIcon, Timer } from "lucide-react";
+import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef } from "react";
-import Time from "../components/Timer"
-import { initScriptLoader } from "next/script";
+import Time from "../components/Timer";
 
-
-function WPM(value : string, sentence : string){
-  const words = sentence.split(" ")
+function WPM(value: string, sentence: string) {
+  const words = sentence.split(" ");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
   const values = value.split(" ");
-  for (let i = 0; i < values.length; i++){
-    console.log(values)
-    if (words[i] === values[i]){
+  for (let i = 0; i < values.length; i++) {
+    console.log(values);
+    if (words[i] === values[i]) {
       correctWords.push(words[i]);
-    }
-    else{
+    } else {
       wrongWords.push(words[i]);
     }
     numberOfWords += 1;
   }
   console.log(wrongWords);
   let accuracy = (correctWords.length / values.length) * 100;
-  const correct = correctWords.length
-  console.log(correct,accuracy);
-  return [accuracy.toFixed(2), correct];
+  const correct = correctWords.length;
+  console.log(correct, accuracy);
+  return [Number(accuracy.toFixed(2)), correct];
 }
 
 const paragraphs = [
@@ -56,19 +53,21 @@ const TypingPractice = () => {
     setTypedText(value);
     setStartCounting(true);
     const x = WPM(typedText, currentParagraph);
-    setAccuracy(x[0])
-    setCorrect(x[1])
-    if (value === currentParagraph) {
+    setAccuracy(x[0]);
+    setCorrect(x[1]);
+    if (value.length === currentParagraph.length) {
       setTypedText("");
       setCurrentParagraph(generateRandomParagraph());
     }
   }
-  
+
   function restartGame() {
     setCurrentParagraph(generateRandomParagraph());
     setTimeElapsed(0);
     setTypedText("");
     setStartCounting(false);
+    setAccuracy(0);
+    setCorrect(0);
   }
 
   return (
@@ -96,12 +95,13 @@ const TypingPractice = () => {
             {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
         ))}
-        <span className="">Accuracy : {accuracy}</span>
+        <span className="">Accuracy : {accuracy}%</span>
         <Time
-        startCounting = {startCounting}
-        correctWords = {correct}
-        timeElapsed = {timeElapsed}
-        setTimeElapsed = {setTimeElapsed} />
+          startCounting={startCounting}
+          correctWords={correct}
+          timeElapsed={timeElapsed}
+          setTimeElapsed={setTimeElapsed}
+        />
         <input
           ref={inputRef}
           type="text"
