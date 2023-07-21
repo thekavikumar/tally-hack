@@ -53,7 +53,6 @@ export function Username() {
   const { setUsername } = useUserStore();
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    // dispatch(login(data.username));
     setUsername(data.username);
     router.push("/practice");
   }
