@@ -1,11 +1,13 @@
+import { ModeToggle } from "@/components/ModeToggle";
+import Practice from "@/app/practice/Practice";
 import { Username } from "@/components/Username";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex justify-center items-center">
-      <div className="mt-28 ml-[550px] max-w-xl mx-auto w-full">
-        <Username />
-      </div>
+    <main>
+      <Username />
+      <ModeToggle />
     </main>
   );
 }
