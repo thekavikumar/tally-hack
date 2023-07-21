@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { useUserStore } from "@/lib/user";
 
 const adjectives = ["happy", "clever", "cool", "lucky", "silly", "brave"];
 const nouns = ["cat", "dog", "panda", "tiger", "lion", "unicorn"];
@@ -47,8 +49,13 @@ export function Username() {
     resolver: zodResolver(FormSchema),
   });
 
+  const router = useRouter();
+  const { setUsername } = useUserStore();
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
+    // dispatch(login(data.username));
+    setUsername(data.username);
+    router.push("/practice");
   }
 
   function handleRegenerate() {
@@ -106,6 +113,7 @@ export function Username() {
           )}
         />
         <Button type="submit">Submit</Button>
+        {/* <h1>User: {user}</h1> */}
       </form>
     </Form>
   );
