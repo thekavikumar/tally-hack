@@ -31,6 +31,7 @@ const Time: React.FC<Props> = ({
         <span>
           Time: {timeElapsed}
         </span>
+        <br></br>
         <span>
           WPM: {(WPM | 0).toFixed(2)}
         </span>

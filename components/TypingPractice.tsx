@@ -9,8 +9,10 @@ function WPM(value : string, sentence : string){
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
-  for (let i = 0; i < words.length; i++){
-    if (words[i] === value[i]){
+  const values = value.split(" ");
+  for (let i = 0; i < values.length; i++){
+    console.log(values)
+    if (words[i] === values[i]){
       correctWords.push(words[i]);
     }
     else{
@@ -18,12 +20,11 @@ function WPM(value : string, sentence : string){
     }
     numberOfWords += 1;
   }
-  console.log(correctWords,wrongWords);
-  let accuracy = (correctWords.length / wrongWords.length) * 100;
+  console.log(wrongWords);
+  let accuracy = (correctWords.length / values.length) * 100;
   const correct = correctWords.length
   console.log(correct,accuracy);
-  return [accuracy, correct];
-
+  return [accuracy.toFixed(2), correct];
 }
 
 const paragraphs = [
@@ -63,7 +64,6 @@ const TypingPractice = () => {
     }
   }
   
-
   function restartGame() {
     setCurrentParagraph(generateRandomParagraph());
     setTimeElapsed(0);
