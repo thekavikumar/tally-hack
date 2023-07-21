@@ -1,5 +1,4 @@
 import { ModeToggle } from "@/components/ModeToggle";
-import Practice from "@/app/practice/Practice";
 import { Username } from "@/components/Username";
 import Link from "next/link";
 
