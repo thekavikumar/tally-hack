@@ -1,5 +1,31 @@
-import { RotateCwIcon } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
+import { RotateCwIcon, Timer } from "lucide-react";
+import React, { useState, useRef } from "react";
+import Time from "../components/Timer"
+import { initScriptLoader } from "next/script";
+
+
+function WPM(value : string, sentence : string){
+  const words = sentence.split(" ")
+  let numberOfWords = 0;
+  let wrongWords = [];
+  let correctWords = [];
+  const values = value.split(" ");
+  for (let i = 0; i < values.length; i++){
+    console.log(values)
+    if (words[i] === values[i]){
+      correctWords.push(words[i]);
+    }
+    else{
+      wrongWords.push(words[i]);
+    }
+    numberOfWords += 1;
+  }
+  console.log(wrongWords);
+  let accuracy = (correctWords.length / values.length) * 100;
+  const correct = correctWords.length
+  console.log(correct,accuracy);
+  return [accuracy.toFixed(2), correct];
+}
 
 const paragraphs = [
   "The quick brown fox jumps over the lazy dog. She sells seashells by the seashore.",
@@ -11,8 +37,14 @@ const TypingPractice = () => {
   const [currentParagraph, setCurrentParagraph] = useState(
     generateRandomParagraph()
   );
+  const [timeElapsed, setTimeElapsed] = useState<number>(0);
+  const [words, setwords] = useState<number>(0);
+  const [currentWord, setCurrentWord] = useState<String>("");
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
+  const [startCounting, setStartCounting] = useState<boolean>(false);
+  const [accuracy, setAccuracy] = useState<number>(0);
+  const [correct, setCorrect] = useState<number>(0);
 
   function generateRandomParagraph() {
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
@@ -22,16 +54,21 @@ const TypingPractice = () => {
   function handleInputChange(event: any) {
     const { value } = event.target;
     setTypedText(value);
-
+    setStartCounting(true);
+    const x = WPM(typedText, currentParagraph);
+    setAccuracy(x[0])
+    setCorrect(x[1])
     if (value === currentParagraph) {
       setTypedText("");
       setCurrentParagraph(generateRandomParagraph());
     }
   }
-
+  
   function restartGame() {
     setCurrentParagraph(generateRandomParagraph());
+    setTimeElapsed(0);
     setTypedText("");
+    setStartCounting(false);
   }
 
   return (
@@ -39,10 +76,6 @@ const TypingPractice = () => {
       <div className="p-4 mb-4 text-lg">
         {" "}
         {/* Increase font size for the paragraphs */}
-        <div className="flex mb-4 items-center gap-5">
-          <h1>60/wpm</h1>
-          <h1>90%</h1>
-        </div>
         {currentParagraph.split(". ").map((sentence, index) => (
           <p key={index} className="font-medium text-3xl">
             {sentence.split("").map((letter, letterIndex) => (
@@ -63,6 +96,12 @@ const TypingPractice = () => {
             {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
         ))}
+        <span className="">Accuracy : {accuracy}</span>
+        <Time
+        startCounting = {startCounting}
+        correctWords = {correct}
+        timeElapsed = {timeElapsed}
+        setTimeElapsed = {setTimeElapsed} />
         <input
           ref={inputRef}
           type="text"

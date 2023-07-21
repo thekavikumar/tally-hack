@@ -7,7 +7,7 @@ interface Props {
   setTimeElapsed: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Timer: React.FC<Props> = ({
+const Time: React.FC<Props> = ({
   startCounting,
   correctWords,
   timeElapsed,
@@ -31,6 +31,7 @@ const Timer: React.FC<Props> = ({
         <span>
           Time: {timeElapsed}
         </span>
+        <br></br>
         <span>
           WPM: {(WPM | 0).toFixed(2)}
         </span>
@@ -38,4 +39,4 @@ const Timer: React.FC<Props> = ({
   );
 };
 
-export default Timer;
+export default Time;
