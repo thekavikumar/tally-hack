@@ -1,3 +1,4 @@
+import { time } from "console";
 import React, { useEffect } from "react";
 
 interface Props {
@@ -14,16 +15,16 @@ const Time: React.FC<Props> = ({
   setTimeElapsed,
 }) => {
   useEffect(() => {
-    if (startCounting) {
+    if (startCounting && timeElapsed > 0) {
       const interval = setInterval(() => {
-        setTimeElapsed((oldSpeed) => oldSpeed + 1);
+        setTimeElapsed((oldSpeed) => oldSpeed - 1);
       }, 1000);
 
       return () => clearInterval(interval);
     }
   }, [startCounting]);
 
-  const minutes = timeElapsed / 60;
+  const minutes = (30 - timeElapsed) / 60;
   const WPM = correctWords / minutes;
 
   return (

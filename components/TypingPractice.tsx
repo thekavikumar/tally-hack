@@ -2,6 +2,8 @@ import { RotateCwIcon, Timer } from "lucide-react";
 import React, { useState, useRef } from "react";
 import Time from "../components/Timer"
 import { initScriptLoader } from "next/script";
+import { coerce } from "zod";
+import { time } from "console";
 
 
 function WPM(value : string, sentence : string){
@@ -11,7 +13,6 @@ function WPM(value : string, sentence : string){
   let correctWords = [];
   const values = value.split(" ");
   for (let i = 0; i < values.length; i++){
-    console.log(values)
     if (words[i] === values[i]){
       correctWords.push(words[i]);
     }
@@ -20,11 +21,9 @@ function WPM(value : string, sentence : string){
     }
     numberOfWords += 1;
   }
-  console.log(wrongWords);
   let accuracy = (correctWords.length / values.length) * 100;
   const correct = correctWords.length
-  console.log(correct,accuracy);
-  return [accuracy.toFixed(2), correct];
+  return [Number(accuracy.toFixed(2)), correct];
 }
 
 const paragraphs = [
@@ -37,14 +36,14 @@ const TypingPractice = () => {
   const [currentParagraph, setCurrentParagraph] = useState(
     generateRandomParagraph()
   );
-  const [timeElapsed, setTimeElapsed] = useState<number>(0);
-  const [words, setwords] = useState<number>(0);
-  const [currentWord, setCurrentWord] = useState<String>("");
+  const [timeElapsed, setTimeElapsed] = useState<number>(30);
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
   const [startCounting, setStartCounting] = useState<boolean>(false);
   const [accuracy, setAccuracy] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
+  const [finished, isFinished] = useState<boolean>(false);
+  const [result, setResult] = useState<any>([timeElapsed, accuracy, correct/(timeElapsed/60)]);
 
   function generateRandomParagraph() {
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
@@ -58,17 +57,20 @@ const TypingPractice = () => {
     const x = WPM(typedText, currentParagraph);
     setAccuracy(x[0])
     setCorrect(x[1])
-    if (value === currentParagraph) {
-      setTypedText("");
-      setCurrentParagraph(generateRandomParagraph());
+    if (value === currentParagraph || timeElapsed === 0) {
+      setResult([timeElapsed, accuracy, correct/(timeElapsed/60)])
+      console.log(result);
+      restartGame();
     }
   }
-  
+
   function restartGame() {
     setCurrentParagraph(generateRandomParagraph());
-    setTimeElapsed(0);
+    setTimeElapsed(30);
     setTypedText("");
     setStartCounting(false);
+    setAccuracy(0);
+    setCorrect(0);
   }
 
   return (
