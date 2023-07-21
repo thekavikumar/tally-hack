@@ -1,13 +1,12 @@
-import { RotateCwIcon, Timer } from "lucide-react";
+import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef } from "react";
 import Time from "../components/Timer"
 import { initScriptLoader } from "next/script";
 import { coerce } from "zod";
 import { time } from "console";
 
-
-function WPM(value : string, sentence : string){
-  const words = sentence.split(" ")
+function WPM(value: string, sentence: string) {
+  const words = sentence.split(" ");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
@@ -15,8 +14,7 @@ function WPM(value : string, sentence : string){
   for (let i = 0; i < values.length; i++){
     if (words[i] === values[i]){
       correctWords.push(words[i]);
-    }
-    else{
+    } else {
       wrongWords.push(words[i]);
     }
     numberOfWords += 1;
@@ -98,12 +96,13 @@ const TypingPractice = () => {
             {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
         ))}
-        <span className="">Accuracy : {accuracy}</span>
+        <span className="">Accuracy : {accuracy}%</span>
         <Time
-        startCounting = {startCounting}
-        correctWords = {correct}
-        timeElapsed = {timeElapsed}
-        setTimeElapsed = {setTimeElapsed} />
+          startCounting={startCounting}
+          correctWords={correct}
+          timeElapsed={timeElapsed}
+          setTimeElapsed={setTimeElapsed}
+        />
         <input
           ref={inputRef}
           type="text"
