@@ -1,6 +1,11 @@
+"use client";
 import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
-import { DialogDemo } from "./Dialog";
+import { DialogDemo } from "@/components/Dialog";
+import { io } from "socket.io-client";
+import { Button } from "@/components/ui/button";
+
+const socket = io("http://localhost:3001");
 
 function WPM(value: string, sentence: string) {
   const words = sentence.split(" "); // Split by one or more spaces
@@ -35,10 +40,13 @@ const TypingPractice = () => {
   const [gameOver, setGameOver] = useState<boolean>(false); // [TODO
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
+  const [usernames, setUsernames] = useState<string[]>([]);
   const [startCounting, setStartCounting] = useState<boolean>(false);
   const [accuracy, setAccuracy] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
   const [finished, isFinished] = useState<boolean>(false);
+  const [roomName, setRoomName] = useState("");
+  const [inRoom, setInRoom] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -62,6 +70,33 @@ const TypingPractice = () => {
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
     return paragraphs[randomIndex];
   }
+  function handleJoinRoom() {
+    if (roomName) {
+      socket.emit("joinRoom", roomName);
+
+      socket.on("userJoined", (userId: any) => {
+        console.log("User joined:", userId);
+      });
+
+      socket.on("roomNotFound", () => {
+        console.log("Room not found.");
+      });
+    }
+  }
+
+  function handleCreateRoom() {
+    if (roomName) {
+      socket.emit("createRoom", roomName);
+
+      socket.on("roomCreated", (roomName: any) => {
+        console.log("Room created:", roomName);
+      });
+
+      socket.on("roomAlreadyExists", () => {
+        console.log("Room already exists.");
+      });
+    }
+  }
 
   function handleInputChange(event: any) {
     const { value } = event.target;
@@ -78,7 +113,35 @@ const TypingPractice = () => {
         handleGameOver();
       }
     }
+
+    const newPosition = (typedText.length / currentParagraph.length) * 100;
+    socket.emit("updateCarPosition", roomName, newPosition);
   }
+
+  useEffect(() => {
+    socket.on("userJoined", (userId: any) => {
+      // Handle when a new user joins the room
+      setUsernames((prevUsernames) => [...prevUsernames, userId]);
+    });
+
+    socket.on("userLeft", (userId: any) => {
+      // Handle when a user leaves the room
+      setUsernames((prevUsernames) =>
+        prevUsernames.filter((username) => username !== userId)
+      );
+    });
+    // Listen for car position updates from other players in the room
+    socket.on("carPositionUpdated", (playerId: any, newPosition: any) => {
+      // Update the car position of the player with playerId
+      // You can use this data to update the car position on the UI
+      console.log(`Player ${playerId} moved to position: ${newPosition}`);
+    });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   function handleGameOver() {
     setGameOver(true);
@@ -96,7 +159,8 @@ const TypingPractice = () => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-7 ">
+    <div className="flex flex-col max-w-5xl mx-auto items-center gap-7 ">
+      <Button onClick={handleCreateRoom}>Create Room</Button>
       <div className="p-4 mb-4 text-lg">
         {" "}
         {/* Increase font size for the paragraphs */}
