@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { DialogDemo } from "./Dialog";
 
 function WPM(value: string, sentence: string) {
-  const words = sentence.split(" "); // Split by one or more spaces
-  const values = value.trim().split(" ");
+  const words = sentence.split(""); // Split by one or more spaces
+  const values = value.trim().split("");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
@@ -121,8 +121,13 @@ const TypingPractice = () => {
             {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
         ))}
-        <span className="">Accuracy : {accuracy}% </span>
-        <span>Time Remaining: {timeElapsed}s</span>
+        <div className="flex items-center gap-5 mt-4">
+          <span className="">Accuracy : {accuracy}% </span>
+          <span>Time Remaining: {timeElapsed}s</span>
+          <span>
+            WPM: {(Number(correct / ((30 - timeElapsed) / 60)) || 0).toFixed(2)}
+          </span>
+        </div>
         <input
           ref={inputRef}
           type="text"
