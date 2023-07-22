@@ -1,16 +1,14 @@
 import { RotateCwIcon } from "lucide-react";
-import React, { useState, useRef } from "react";
-import Time from "../components/Timer";
+import React, { useState, useRef, useEffect } from "react";
 import { DialogDemo } from "./Dialog";
 
 function WPM(value: string, sentence: string) {
-  const words = sentence.split(" ");
+  const words = sentence.split(" "); // Split by one or more spaces
+  const values = value.split(" ");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
-  const values = value.split(" ");
   for (let i = 0; i < values.length; i++) {
-    console.log(values);
     if (words[i] === values[i]) {
       correctWords.push(words[i]);
     } else {
@@ -18,10 +16,8 @@ function WPM(value: string, sentence: string) {
     }
     numberOfWords += 1;
   }
-  console.log(wrongWords);
   let accuracy = (correctWords.length / values.length) * 100;
   const correct = correctWords.length;
-  console.log(correct, accuracy);
   return [Number(accuracy.toFixed(2)), correct];
 }
 
@@ -35,13 +31,32 @@ const TypingPractice = () => {
   const [currentParagraph, setCurrentParagraph] = useState(
     generateRandomParagraph()
   );
-  const [timeElapsed, setTimeElapsed] = useState<number>(0);
-  const [gameOver, setGameOver] = useState<boolean>(true); // [TODO
+  const [timeElapsed, setTimeElapsed] = useState<number>(30);
+  const [gameOver, setGameOver] = useState<boolean>(false); // [TODO
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
   const [startCounting, setStartCounting] = useState<boolean>(false);
   const [accuracy, setAccuracy] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
+  const [finished, isFinished] = useState<boolean>(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (startCounting && timeElapsed > 0) {
+      interval = setInterval(() => {
+        setTimeElapsed((prevTime) => prevTime - 1);
+      }, 1000);
+    }
+
+    if (timeElapsed === 0) {
+      handleGameOver();
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [startCounting, timeElapsed]);
 
   function generateRandomParagraph() {
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
@@ -52,22 +67,32 @@ const TypingPractice = () => {
     const { value } = event.target;
     setTypedText(value);
     setStartCounting(true);
-    const x = WPM(typedText, currentParagraph);
-    setAccuracy(x[0]);
-    setCorrect(x[1]);
-    if (value.length === currentParagraph.length) {
-      setTypedText("");
-      setCurrentParagraph(generateRandomParagraph());
+    const [accuracy, correctWords] = WPM(value, currentParagraph);
+    setAccuracy(accuracy);
+    setCorrect(correctWords);
+
+    if (value === currentParagraph) {
+      if (timeElapsed > 0) {
+        generateRandomParagraph();
+      } else {
+        handleGameOver();
+      }
     }
+  }
+
+  function handleGameOver() {
+    setGameOver(true);
+    setStartCounting(false);
   }
 
   function restartGame() {
     setCurrentParagraph(generateRandomParagraph());
-    setTimeElapsed(0);
+    setTimeElapsed(30);
     setTypedText("");
     setStartCounting(false);
     setAccuracy(0);
     setCorrect(0);
+    setGameOver(false);
   }
 
   return (
@@ -95,13 +120,8 @@ const TypingPractice = () => {
             {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
         ))}
-        <span className="">Accuracy : {accuracy}%</span>
-        <Time
-          startCounting={startCounting}
-          correctWords={correct}
-          timeElapsed={timeElapsed}
-          setTimeElapsed={setTimeElapsed}
-        />
+        <span className="">Accuracy : {accuracy}% </span>
+        <span>Time Remaining: {timeElapsed}s</span>
         <input
           ref={inputRef}
           type="text"
@@ -109,6 +129,7 @@ const TypingPractice = () => {
           onChange={handleInputChange}
           className=" border bg-foreground/5 rounded-md w-full text-green-400 border-gray-400 focus:border-green-400 p-3 font-medium focus:ring-2 focus:ring-green-400 focus:outline-none mt-5"
           autoFocus
+          disabled={gameOver}
         />
       </div>
       <button
@@ -118,7 +139,16 @@ const TypingPractice = () => {
         <RotateCwIcon size={16} />
         Restart
       </button>
-      {gameOver && <DialogDemo />}
+      {gameOver && (
+        <div>
+          <p>Game Over!</p>
+          <DialogDemo
+            accuracy={accuracy}
+            time={timeElapsed}
+            wpm={Number((correct / (30 / 60)).toFixed(2))}
+          />
+        </div>
+      )}
     </div>
   );
 };

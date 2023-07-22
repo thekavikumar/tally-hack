@@ -8,10 +8,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUserStore } from "@/lib/user";
 
-export function DialogDemo() {
+interface Props {
+  accuracy: number;
+  wpm: number;
+  time: number;
+}
+
+export function DialogDemo({ accuracy, wpm, time }: Props) {
+  const { username } = useUserStore();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -30,7 +38,7 @@ export function DialogDemo() {
               Username :
             </Label>
             <Label id="username" className="col-span-3">
-              Pedro Duarte
+              {username}
             </Label>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -38,7 +46,7 @@ export function DialogDemo() {
               Accuracy :
             </Label>
             <Label id="accuracy" className="col-span-3">
-              99%
+              {accuracy}
             </Label>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -46,15 +54,7 @@ export function DialogDemo() {
               WPM :
             </Label>
             <Label id="wpm" className="col-span-3">
-              99
-            </Label>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">
-              Time :
-            </Label>
-            <Label id="time" className="col-span-3">
-              99
+              {wpm}
             </Label>
           </div>
         </div>
