@@ -10,7 +10,7 @@ function page() {
   const [roomName, setRoomName] = useState("");
   const [roomCreated, setRoomCreated] = useState(false);
   const [userId, setUserId] = useState(""); // New state variable for storing user ID
-  const [userList, setUserList] = useState([]); // New state variable for storing the user list
+  const [userList, setUserList] = useState<string[]>([]); // New state variable for storing the user list
 
   function handlePost() {
     socket.emit("createRoom", "your-room-name");
@@ -25,11 +25,18 @@ function page() {
       setRoomCreated(true);
     });
 
+    socket.on("userId", (userId) => {
+      setUserId(userId);
+    });
+
+    // Listen for "userList" event and update the user list
     socket.on("userList", (users) => {
       setUserList(users);
     });
-    socket.on("userId", (id) => {
-      setUserId(id);
+
+    // Listen for "userJoined" event and update the user list
+    socket.on("userJoined", (userId) => {
+      setUserList((prevUserList) => [...prevUserList, userId]);
     });
 
     socket.on("roomAlreadyExists", () => {
