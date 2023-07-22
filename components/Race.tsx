@@ -23,4 +23,4 @@ const Race : React.FC<Props> = ({
     );
  }
 
- export default Race
+export default Race;
