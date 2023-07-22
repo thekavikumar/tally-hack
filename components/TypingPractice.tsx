@@ -4,7 +4,7 @@ import { DialogDemo } from "./Dialog";
 
 function WPM(value: string, sentence: string) {
   const words = sentence.split(" "); // Split by one or more spaces
-  const values = value.split(" ");
+  const values = value.trim().split(" ");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
@@ -16,6 +16,7 @@ function WPM(value: string, sentence: string) {
     }
     numberOfWords += 1;
   }
+  console.log(values);
   let accuracy = (correctWords.length / values.length) * 100;
   const correct = correctWords.length;
   return [Number(accuracy.toFixed(2)), correct];

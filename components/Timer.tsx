@@ -15,7 +15,7 @@ const Time: React.FC<Props> = ({
   setTimeElapsed,
 }) => {
   useEffect(() => {
-    if (startCounting && timeElapsed > 0) {
+    if (startCounting) {
       const interval = setInterval(() => {
         if (timeElapsed !== 0) {
           setTimeElapsed((oldSpeed: any) => oldSpeed - 1);
