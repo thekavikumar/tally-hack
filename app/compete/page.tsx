@@ -1,29 +1,29 @@
+"use client";
 import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
-import { DialogDemo } from "./Dialog";
-import Race from "./Race";
-import { type } from "os";
+import { DialogDemo } from "@/components/Dialog";
+import { io } from "socket.io-client";
+import { Button } from "@/components/ui/button";
 
-function WPM(value: string, sentence: string, correct: number) {
-  const words = sentence.split(""); // Split by one or more spaces
-  const values = value.trim().split("");
+const socket = io("http://localhost:3001");
+
+function WPM(value: string, sentence: string) {
+  const words = sentence.split(" "); // Split by one or more spaces
+  const values = value.split(" ");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
-  let w = 0;
   for (let i = 0; i < values.length; i++) {
     if (words[i] === values[i]) {
       correctWords.push(words[i]);
     } else {
       wrongWords.push(words[i]);
     }
-    if (words[i] === " "){
-      w += 1;
-    }
     numberOfWords += 1;
   }
-  let accuracy = ((correct + correctWords.length - wrongWords.length) / (values.length + correct)) * 100;
-  return [Number(accuracy.toFixed(2)), w, values.length];
+  let accuracy = (correctWords.length / values.length) * 100;
+  const correct = correctWords.length;
+  return [Number(accuracy.toFixed(2)), correct];
 }
 
 const paragraphs = [
@@ -40,11 +40,13 @@ const TypingPractice = () => {
   const [gameOver, setGameOver] = useState<boolean>(false); // [TODO
   const [typedText, setTypedText] = useState("");
   const inputRef = useRef(null);
+  const [usernames, setUsernames] = useState<string[]>([]);
   const [startCounting, setStartCounting] = useState<boolean>(false);
   const [accuracy, setAccuracy] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
-  const [value, setValue] = useState<Number>(0);
-  const [cor, setCor] = useState<number>(correct);
+  const [finished, isFinished] = useState<boolean>(false);
+  const [roomName, setRoomName] = useState("");
+  const [inRoom, setInRoom] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -68,26 +70,78 @@ const TypingPractice = () => {
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
     return paragraphs[randomIndex];
   }
+  function handleJoinRoom() {
+    if (roomName) {
+      socket.emit("joinRoom", roomName);
+
+      socket.on("userJoined", (userId: any) => {
+        console.log("User joined:", userId);
+      });
+
+      socket.on("roomNotFound", () => {
+        console.log("Room not found.");
+      });
+    }
+  }
+
+  function handleCreateRoom() {
+    if (roomName) {
+      socket.emit("createRoom", roomName);
+
+      socket.on("roomCreated", (roomName: any) => {
+        console.log("Room created:", roomName);
+      });
+
+      socket.on("roomAlreadyExists", () => {
+        console.log("Room already exists.");
+      });
+    }
+  }
 
   function handleInputChange(event: any) {
     const { value } = event.target;
     setTypedText(value);
     setStartCounting(true);
-    const [accuracy, correctWords,v] = WPM(typedText, currentParagraph,cor);
+    const [accuracy, correctWords] = WPM(value, currentParagraph);
     setAccuracy(accuracy);
     setCorrect(correctWords);
-    setValue(v);
-    if (typedText.length === currentParagraph.length) {
-      setCor(correct);
+
+    if (value === currentParagraph) {
       if (timeElapsed > 0) {
-        setCurrentParagraph(generateRandomParagraph());
-        setTypedText("")
+        generateRandomParagraph();
       } else {
         handleGameOver();
       }
-
     }
+
+    const newPosition = (typedText.length / currentParagraph.length) * 100;
+    socket.emit("updateCarPosition", roomName, newPosition);
   }
+
+  useEffect(() => {
+    socket.on("userJoined", (userId: any) => {
+      // Handle when a new user joins the room
+      setUsernames((prevUsernames) => [...prevUsernames, userId]);
+    });
+
+    socket.on("userLeft", (userId: any) => {
+      // Handle when a user leaves the room
+      setUsernames((prevUsernames) =>
+        prevUsernames.filter((username) => username !== userId)
+      );
+    });
+    // Listen for car position updates from other players in the room
+    socket.on("carPositionUpdated", (playerId: any, newPosition: any) => {
+      // Update the car position of the player with playerId
+      // You can use this data to update the car position on the UI
+      console.log(`Player ${playerId} moved to position: ${newPosition}`);
+    });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   function handleGameOver() {
     setGameOver(true);
@@ -95,7 +149,6 @@ const TypingPractice = () => {
   }
 
   function restartGame() {
-    setCor(0);
     setCurrentParagraph(generateRandomParagraph());
     setTimeElapsed(30);
     setTypedText("");
@@ -106,20 +159,20 @@ const TypingPractice = () => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-7 ">
+    <div className="flex flex-col max-w-5xl mx-auto items-center gap-7 ">
+      <Button onClick={handleCreateRoom}>Create Room</Button>
       <div className="p-4 mb-4 text-lg">
-        <Race 
-        value = {typedText}
-        word = {currentParagraph}/>
         {" "}
         {/* Increase font size for the paragraphs */}
-          <p className="font-medium text-3xl">
-            {currentParagraph.split("").map((letter, letterIndex) => (
+        {currentParagraph.split(". ").map((sentence, index) => (
+          <p key={index} className="font-medium text-3xl">
+            {sentence.split("").map((letter, letterIndex) => (
               <span
                 key={letterIndex}
                 className={
-                  letterIndex < typedText.split("").length
-                    ? letter === typedText.split("")[letterIndex]
+                  index === typedText.split(". ").length - 1 &&
+                  letterIndex < typedText.split(". ")[index].length
+                    ? letter === typedText.split(". ")[index][letterIndex]
                       ? "text-green-600"
                       : "text-red-600"
                     : ""
@@ -128,10 +181,11 @@ const TypingPractice = () => {
                 {letter}
               </span>
             ))}
+            {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
+        ))}
         <span className="">Accuracy : {accuracy}% </span>
-        <span>Time Remaining: {timeElapsed}s </span>
-        <span>WPM: {Number((correct / ((30 - timeElapsed )/ 60)).toFixed(2))}</span>
+        <span>Time Remaining: {timeElapsed}s</span>
         <input
           ref={inputRef}
           type="text"
