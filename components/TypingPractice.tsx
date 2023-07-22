@@ -17,12 +17,15 @@ function WPM(value: string, sentence: string, correct: number) {
     } else {
       wrongWords.push(words[i]);
     }
-    if (words[i] === " "){
+    if (words[i] === " ") {
       w += 1;
     }
     numberOfWords += 1;
   }
-  let accuracy = ((correct + correctWords.length - wrongWords.length) / (values.length + correct)) * 100;
+  let accuracy =
+    ((correct + correctWords.length - wrongWords.length) /
+      (values.length + correct)) *
+    100;
   return [Number(accuracy.toFixed(2)), w, values.length];
 }
 
@@ -73,7 +76,7 @@ const TypingPractice = () => {
     const { value } = event.target;
     setTypedText(value);
     setStartCounting(true);
-    const [accuracy, correctWords,v] = WPM(typedText, currentParagraph,cor);
+    const [accuracy, correctWords, v] = WPM(typedText, currentParagraph, cor);
     setAccuracy(accuracy);
     setCorrect(correctWords);
     setValue(v);
@@ -81,11 +84,10 @@ const TypingPractice = () => {
       setCor(correct);
       if (timeElapsed > 0) {
         setCurrentParagraph(generateRandomParagraph());
-        setTypedText("")
+        setTypedText("");
       } else {
         handleGameOver();
       }
-
     }
   }
 
@@ -108,30 +110,31 @@ const TypingPractice = () => {
   return (
     <div className="flex flex-col items-center gap-7 ">
       <div className="p-4 mb-4 text-lg">
-        <Race 
-        value = {typedText}
-        word = {currentParagraph}/>
-        {" "}
+        {/* <Race value={typedText} word={currentParagraph} />{" "} */}
         {/* Increase font size for the paragraphs */}
-          <p className="font-medium text-3xl">
-            {currentParagraph.split("").map((letter, letterIndex) => (
-              <span
-                key={letterIndex}
-                className={
-                  letterIndex < typedText.split("").length
-                    ? letter === typedText.split("")[letterIndex]
-                      ? "text-green-600"
-                      : "text-red-600"
-                    : ""
-                }
-              >
-                {letter}
-              </span>
-            ))}
-          </p>
-        <span className="">Accuracy : {accuracy}% </span>
-        <span>Time Remaining: {timeElapsed}s </span>
-        <span>WPM: {Number((correct / ((30 - timeElapsed )/ 60)).toFixed(2))}</span>
+        <p className="font-medium text-3xl">
+          {currentParagraph.split("").map((letter, letterIndex) => (
+            <span
+              key={letterIndex}
+              className={
+                letterIndex < typedText.split("").length
+                  ? letter === typedText.split("")[letterIndex]
+                    ? "text-green-600"
+                    : "text-red-600"
+                  : ""
+              }
+            >
+              {letter}
+            </span>
+          ))}
+        </p>
+        <div className="flex items-center gap-3 mt-4">
+          <span className="">Accuracy : {accuracy}% </span>
+          <span>Time Remaining: {timeElapsed}s </span>
+          <span>
+            WPM: {Number((correct / ((30 - timeElapsed) / 60)).toFixed(2)) || 0}
+          </span>
+        </div>
         <input
           ref={inputRef}
           type="text"
