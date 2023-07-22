@@ -1,25 +1,29 @@
 import { RotateCwIcon } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { DialogDemo } from "./Dialog";
+import Race from "./Race";
+import { type } from "os";
 
-function WPM(value: string, sentence: string) {
-  const words = sentence.split(" "); // Split by one or more spaces
-  const values = value.trim().split(" ");
+function WPM(value: string, sentence: string, correct: number) {
+  const words = sentence.split(""); // Split by one or more spaces
+  const values = value.trim().split("");
   let numberOfWords = 0;
   let wrongWords = [];
   let correctWords = [];
+  let w = 0;
   for (let i = 0; i < values.length; i++) {
     if (words[i] === values[i]) {
       correctWords.push(words[i]);
     } else {
       wrongWords.push(words[i]);
     }
+    if (words[i] === " "){
+      w += 1;
+    }
     numberOfWords += 1;
   }
-  console.log(values);
-  let accuracy = (correctWords.length / values.length) * 100;
-  const correct = correctWords.length;
-  return [Number(accuracy.toFixed(2)), correct];
+  let accuracy = ((correct + correctWords.length - wrongWords.length) / (values.length + correct)) * 100;
+  return [Number(accuracy.toFixed(2)), w, values.length];
 }
 
 const paragraphs = [
@@ -39,7 +43,8 @@ const TypingPractice = () => {
   const [startCounting, setStartCounting] = useState<boolean>(false);
   const [accuracy, setAccuracy] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
-  const [finished, isFinished] = useState<boolean>(false);
+  const [value, setValue] = useState<Number>(0);
+  const [cor, setCor] = useState<number>(correct);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -68,16 +73,19 @@ const TypingPractice = () => {
     const { value } = event.target;
     setTypedText(value);
     setStartCounting(true);
-    const [accuracy, correctWords] = WPM(value, currentParagraph);
+    const [accuracy, correctWords,v] = WPM(typedText, currentParagraph,cor);
     setAccuracy(accuracy);
     setCorrect(correctWords);
-
-    if (value === currentParagraph) {
+    setValue(v);
+    if (typedText.length === currentParagraph.length) {
+      setCor(correct);
       if (timeElapsed > 0) {
-        generateRandomParagraph();
+        setCurrentParagraph(generateRandomParagraph());
+        setTypedText("")
       } else {
         handleGameOver();
       }
+
     }
   }
 
@@ -87,6 +95,7 @@ const TypingPractice = () => {
   }
 
   function restartGame() {
+    setCor(0);
     setCurrentParagraph(generateRandomParagraph());
     setTimeElapsed(30);
     setTypedText("");
@@ -99,17 +108,18 @@ const TypingPractice = () => {
   return (
     <div className="flex flex-col items-center gap-7 ">
       <div className="p-4 mb-4 text-lg">
+        <Race 
+        value = {typedText}
+        word = {currentParagraph}/>
         {" "}
         {/* Increase font size for the paragraphs */}
-        {currentParagraph.split(". ").map((sentence, index) => (
-          <p key={index} className="font-medium text-3xl">
-            {sentence.split("").map((letter, letterIndex) => (
+          <p className="font-medium text-3xl">
+            {currentParagraph.split("").map((letter, letterIndex) => (
               <span
                 key={letterIndex}
                 className={
-                  index === typedText.split(". ").length - 1 &&
-                  letterIndex < typedText.split(". ")[index].length
-                    ? letter === typedText.split(". ")[index][letterIndex]
+                  letterIndex < typedText.split("").length
+                    ? letter === typedText.split("")[letterIndex]
                       ? "text-green-600"
                       : "text-red-600"
                     : ""
@@ -118,11 +128,10 @@ const TypingPractice = () => {
                 {letter}
               </span>
             ))}
-            {index < currentParagraph.split(". ").length - 1 && <span>. </span>}
           </p>
-        ))}
         <span className="">Accuracy : {accuracy}% </span>
-        <span>Time Remaining: {timeElapsed}s</span>
+        <span>Time Remaining: {timeElapsed}s </span>
+        <span>WPM: {Number((correct / ((30 - timeElapsed )/ 60)).toFixed(2))}</span>
         <input
           ref={inputRef}
           type="text"
