@@ -34,10 +34,10 @@ function page() {
         </div>
         <div className="h-6 rounded-md bg-black mr-3 ml-3 w-1"></div>
         <div className="flex items-center gap-4">
-          <button className="bg-transparent text-foreground hover:text-foreground transition-all duration-150">
+          <button className="bg-transparent hover:text-foreground transition-all duration-150">
             15
           </button>
-          <button className="bg-transparent hover:text-foreground transition-all duration-150">
+          <button className="bg-transparent text-foreground hover:text-foreground transition-all duration-150">
             30
           </button>
           <button className="bg-transparent hover:text-foreground transition-all duration-150">

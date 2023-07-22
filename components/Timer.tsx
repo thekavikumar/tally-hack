@@ -5,7 +5,7 @@ interface Props {
   startCounting: boolean;
   correctWords: number;
   timeElapsed: number;
-  setTimeElapsed: React.Dispatch<React.SetStateAction<number>>;
+  setTimeElapsed: any;
 }
 
 const Time: React.FC<Props> = ({
@@ -17,7 +17,9 @@ const Time: React.FC<Props> = ({
   useEffect(() => {
     if (startCounting) {
       const interval = setInterval(() => {
-        setTimeElapsed((oldSpeed) => oldSpeed - 1);
+        if (timeElapsed !== 0) {
+          setTimeElapsed((oldSpeed: any) => oldSpeed - 1);
+        }
       }, 1000);
 
       return () => clearInterval(interval);
@@ -29,13 +31,9 @@ const Time: React.FC<Props> = ({
 
   return (
     <div>
-        <span>
-          Time: {timeElapsed}
-        </span>
-        <br></br>
-        <span>
-          WPM: {(WPM | 0).toFixed(2)}
-        </span>
+      <span>Time: {timeElapsed}</span>
+      <br></br>
+      <span>WPM: {(WPM | 0).toFixed(2)}</span>
     </div>
   );
 };
