@@ -12,11 +12,6 @@ function page() {
   const [userId, setUserId] = useState(""); // New state variable for storing user ID
   const [userList, setUserList] = useState<string[]>([]); // New state variable for storing the user list
 
-  function handlePost() {
-    socket.emit("createRoom", "your-room-name");
-    console.log("create room");
-  }
-
   useEffect(() => {
     // Listen for "roomCreated" event and handle the received room ID
     socket.on("roomCreated", (roomName) => {
