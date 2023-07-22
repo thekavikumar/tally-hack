@@ -142,6 +142,7 @@ const TypingPractice = () => {
           onChange={handleInputChange}
           className=" border bg-foreground/5 rounded-md w-full text-green-400 border-gray-400 focus:border-green-400 p-3 font-medium focus:ring-2 focus:ring-green-400 focus:outline-none mt-5"
           autoFocus
+          placeholder="Start typing..."
           disabled={gameOver}
         />
       </div>
