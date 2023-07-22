@@ -2,13 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
 
 interface Props {
-    value : string;
-    word : string;
+    percentage: number;
   }
 
 const Race : React.FC<Props> = ({
-    value,
-    word,
+    percentage
 }) => {
     const mainDiv = {
        width: "100%",
@@ -16,7 +14,7 @@ const Race : React.FC<Props> = ({
     return (
        <div style = {mainDiv}>
           <ProgressBar 
-          completed = {(value.length/word.length) * 100} 
+          completed = {percentage * 100} 
           bgColor = "red" 
           animateOnRender = {true} 
           isLabelVisible = {false} 

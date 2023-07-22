@@ -109,8 +109,7 @@ const TypingPractice = () => {
     <div className="flex flex-col items-center gap-7 ">
       <div className="p-4 mb-4 text-lg">
         <Race 
-        value = {typedText}
-        word = {currentParagraph}/>
+        percentage = {typedText.length / currentParagraph.length}/>
         {" "}
         {/* Increase font size for the paragraphs */}
           <p className="font-medium text-3xl">
